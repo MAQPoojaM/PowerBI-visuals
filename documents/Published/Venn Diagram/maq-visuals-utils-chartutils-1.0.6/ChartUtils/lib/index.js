@@ -2067,11 +2067,9 @@ var powerbi;
                             this.isScrollable = isScrollable;
                             this.element = element;
                             this.changeOrientation(legendPosition);
-                            this.clickFlag = 0;
                             this.parentViewport = { height: 0, width: 0 };
                             this.calculateViewport();
                             this.updateLayout();
-                            this.legendSetting;	
                         }
                         SVGLegend.prototype.updateLayout = function () {
                             var legendViewport = this.viewport;
@@ -2091,13 +2089,11 @@ var powerbi;
                             });
                             var isRight = orientation === legend.LegendPosition.Right || orientation === legend.LegendPosition.RightCenter,
                                 isBottom = orientation === legend.LegendPosition.Bottom || orientation === legend.LegendPosition.BottomCenter;
-                                if(!this.clickFlag){
+
                             this.svg.style({
                                 "margin-left": isRight ? (this.parentViewport.width - legendViewport.width) + "px" : null,
                                 "margin-top": isBottom ? (this.parentViewport.height - legendViewport.height) + "px" : null,
                             });
-                        }
-                            this.clickFlag = 0;	
                         };
                         SVGLegend.prototype.calculateViewport = function (data) {
                             switch (this.orientation) {
@@ -2142,9 +2138,8 @@ var powerbi;
                         SVGLegend.prototype.getOrientation = function () {
                             return this.orientation;
                         };
-                        SVGLegend.prototype.drawLegend = function (data, viewport,legendSetting) {
+                        SVGLegend.prototype.drawLegend = function (data, viewport) {
                             // clone because we modify legend item label with ellipsis if it is truncated
-                            this.legendSetting = legendSetting;
                             var clonedData = Prototype.inherit(data),
                                 //var clonedData = $.extend({}, data, true);
                                 newDataPoints = [];
@@ -2207,8 +2202,8 @@ var powerbi;
                                 .style({
                                     "fill": data.labelColor,
                                     "font-size": PixelConverter.fromPoint(data.fontSize),
-                                    "font-family": this.legendSetting.fontFamily,	
-                                    "font-weight": 600	                                })
+                                    "font-family": 'Segoe UI Semibold, wf_segoe-ui_semibold, helvetica, arial, sans-serif;'
+                                })
                                 .text(function (d) { return d.text; })
                                 .attr({
                                     "x": function (d) { return d.x; },
@@ -2272,8 +2267,7 @@ var powerbi;
                                 .text(function (d) { return d.label; })
                                 .style({
                                     "fill": data.labelColor,
-                                    "font-size": PixelConverter.fromPoint(data.fontSize),
-                                    "font-family": this.legendSetting.fontFamily	
+                                    "font-size": PixelConverter.fromPoint(data.fontSize)
                                 });
 
                             //Primary Measure
@@ -2403,7 +2397,7 @@ var powerbi;
                                     maxMeasureLength = this.legendFontSizeMarginValue < SVGLegend.DefaultTextMargin ? SVGLegend.MaxTitleLength :
                                         SVGLegend.MaxTitleLength + (SVGLegend.DefaultMaxLegendFactor * this.legendFontSizeMarginDifference);
                                 }
-                                var textProperties = SVGLegend.getTextProperties(true, title, this.data.fontSize, this.legendSetting);
+                                var textProperties = SVGLegend.getTextProperties(true, title, this.data.fontSize);
                                 var text = title;
                                 width = textMeasurementService.measureSvgTextWidth(textProperties);
                                 if (width > maxMeasureLength) {
@@ -2525,7 +2519,7 @@ var powerbi;
                         /**
                          * Calculates the widths for each horizontal legend item.
                          */
-                        SVGLegend.calculateHorizontalLegendItemsWidths = function (dataPoints, availableWidth, iconPadding, fontSize,legendSetting) {
+                        SVGLegend.calculateHorizontalLegendItemsWidths = function (dataPoints, availableWidth, iconPadding, fontSize) {
                             var dataPointsLength = dataPoints.length;
                             // Set the maximum amount of space available to each item. They can use less, but can't go over this number.
                             var maxItemWidth = dataPointsLength > 0 ? availableWidth / dataPointsLength | 0 : 0;
@@ -2547,7 +2541,7 @@ var powerbi;
                             // Add legend items until we can't fit any more (the last one doesn't fit) or we've added all of them
                             for (var _i = 0, dataPoints_1 = dataPoints; _i < dataPoints_1.length; _i++) {
                                 var dataPoint = dataPoints_1[_i];
-                                var textProperties = SVGLegend.getTextProperties(false, dataPoint.label, fontSize,legendSetting);
+                                var textProperties = SVGLegend.getTextProperties(false, dataPoint.label, fontSize);
                                 var itemTextWidth = textMeasurementService.measureSvgTextWidth(textProperties);
                                 var desiredWidth = itemTextWidth + iconPadding;
                                 var overMaxWidth = desiredWidth > maxItemWidth;
@@ -2635,7 +2629,7 @@ var powerbi;
                             }
 
                             // get the Y coordinate which is the middle of the container + the middle of the text height - the delta of the text 
-                            var defaultTextProperties = SVGLegend.getTextProperties(false, "", this.data.fontSize,this.legendSetting);
+                            var defaultTextProperties = SVGLegend.getTextProperties(false, "", this.data.fontSize);
                             var verticalCenter = this.viewport.height / 2;
                             var textYCoordinate = verticalCenter + textMeasurementService.estimateSvgTextHeight(defaultTextProperties) / 2
                                 - textMeasurementService.estimateSvgTextBaselineDelta(defaultTextProperties);
