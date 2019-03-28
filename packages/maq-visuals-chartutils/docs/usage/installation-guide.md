@@ -16,7 +16,7 @@ To use the package you should have the following things:
 To install the package you should run the following command in the directory with your current custom visual:
 
 ```bash
-npm install maq-visuals-utils-chartutils@1.0.5 --save
+npm install maq-visuals-chartutils@1.0.5 --save
 ```
 
 This command installs the package and adds a package as a dependency to your ```package.json```
@@ -28,7 +28,7 @@ The package contains ```d.ts``` declarations file, it's necessary for TypeScript
 * ```node_modules/powerbi-visuals-utils-interactivityutils/lib/index.d.ts```
 * ```node_modules/powerbi-visuals-utils-svgutils/lib/index.d.ts```
 * ```node_modules/powerbi-visuals-utils-typeutils/lib/index.d.ts```
-* ```node_modules/maq-visuals-utils-chartutils/lib/index.d.ts```
+* ```node_modules/maq-visuals-chartutils/lib/index.d.ts```
 
 As a result you will have the following file structure:
 ```json
@@ -40,7 +40,7 @@ As a result you will have the following file structure:
     "node_modules/powerbi-visuals-utils-interactivityutils/lib/index.d.ts",
     "node_modules/powerbi-visuals-utils-svgutils/lib/index.d.ts",
     "node_modules/powerbi-visuals-utils-typeutils/lib/index.d.ts",
-    "node_modules/maq-visuals-utils-chartutils/lib/index.d.ts"
+    "node_modules/maq-visuals-chartutils/lib/index.d.ts"
   ]
 }
 ```
@@ -54,7 +54,7 @@ To use the package with your custom visuals you should add the following files t
 * ```node_modules/powerbi-visuals-utils-svgutils/lib/index.js```
 * ```node_modules/powerbi-visuals-utils-formattingutils/lib/index.js```
 * ```node_modules/powerbi-visuals-utils-interactivityutils/lib/index.js```
-* ```node_modules/maq-visuals-utils-chartutils/lib/index.js```
+* ```node_modules/maq-visuals-chartutils/lib/index.js```
 
 As a result you will have the following file structure:
 ```json
@@ -71,7 +71,7 @@ As a result you will have the following file structure:
     "node_modules/powerbi-visuals-utils-svgutils/lib/index.js",
     "node_modules/powerbi-visuals-utils-formattingutils/lib/index.js",
     "node_modules/powerbi-visuals-utils-interactivityutils/lib/index.js",
-    "node_modules/maq-visuals-utils-chartutils/lib/index.js"
+    "node_modules/maq-visuals-chartutils/lib/index.js"
   ],
   "style": ...,
   "capabilities": ...
@@ -82,12 +82,12 @@ As a result you will have the following file structure:
 To use the package with your custom visuals you should import the following CSS files to your ```.less``` file:
 
 * ```node_modules/powerbi-visuals-utils-interactivityutils/lib/index.css```
-* ```node_modules/maq-visuals-utils-chartutils/lib/index.css```
+* ```node_modules/maq-visuals-chartutils/lib/index.css```
 
 As a result you will have the following file structure:
 ```less
 @import (less) "node_modules/powerbi-visuals-utils-interactivityutils/lib/index.css";
-@import (less) "node_modules/maq-visuals-utils-chartutils/lib/index.css";
+@import (less) "node_modules/maq-visuals-chartutils/lib/index.css";
 ```
 
 Please note, you should import ```.css``` files as ```.less``` files, because Power BI Visuals Tools wraps the external CSS rules.

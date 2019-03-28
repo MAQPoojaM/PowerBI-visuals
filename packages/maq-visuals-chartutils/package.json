@@ -1,11 +1,11 @@
 {
-  "name": "maq-visuals-utils-chartutils",
-  "version": "1.0.7",
+  "name": "maq-visuals-chartutils",
+  "version": "3.0.0",
   "description": "ChartUtils",
   "main": "lib/index.js",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/maqsoftware/PowerBI-visuals/tree/master/packages/maq-visuals-utils-chartutils"
+    "url": "git+https://github.com/maqsoftware/PowerBI-visuals/tree/master/packages/maq-visuals-chartutils"
   },
   "keywords": [
     "powerbi-visuals-utils"
@@ -13,9 +13,9 @@
   "author": "MAQSoftware",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/maqsoftware/PowerBI-visuals/tree/master/packages/maq-visuals-utils-chartutils#issues"
+    "url": "https://github.com/maqsoftware/PowerBI-visuals/tree/master/packages/maq-visuals-chartutils#issues"
   },
-  "homepage": "https://github.com/maqsoftware/PowerBI-visuals/tree/master/packages/maq-visuals-utils-chartutils#readme",
+  "homepage": "https://github.com/maqsoftware/PowerBI-visuals/tree/master/packages/maq-visuals-chartutils#readme",
   "files": [
     "lib"
   ],
