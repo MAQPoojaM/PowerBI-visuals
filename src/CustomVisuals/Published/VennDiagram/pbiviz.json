@@ -4,7 +4,7 @@
     "displayName": "Venn Diagram by MAQ Software",
     "guid": "vennDiagram8527AJ74DB74562488PCR752UTY9465",
     "visualClassName": "VennDiagram",
-    "version": "3.0.5",
+    "version": "3.0.6",
     "description": "Overlapping circles illustrate the relationship among two or more datasets",
     "supportUrl": "https://github.com/maqsoftware/PowerBI-visuals/issues",
     "gitHubUrl": "https://github.com/maqsoftware/PowerBI-visuals/"
