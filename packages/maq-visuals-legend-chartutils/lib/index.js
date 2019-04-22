@@ -2113,13 +2113,6 @@ var powerbi;
                                     var width = this.lastCalculatedWidth
                                         ? this.lastCalculatedWidth
                                         : this.parentViewport.width * SVGLegend.LegendMaxWidthFactor;
-                                    // if (this.showPrimary) {
-                                    //     width = ((data.dataPoints[0]['measure'].length + 1) * this.data.fontSize / 2);
-                                    // }
-
-                                    // if (!this.showPrimary && data.dataPoints[0]['secondaryMeasure'] > 0) {
-                                    //     width = data.dataPoints[0]['secondaryMeasure'].length * this.data.fontSize / 2;
-                                    // }
                                     this.viewport = { height: 0, width: width + this.data.fontSize };
                                     return;
                                 case legend.LegendPosition.None:
