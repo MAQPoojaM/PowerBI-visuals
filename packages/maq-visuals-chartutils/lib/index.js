@@ -2074,15 +2074,16 @@ var powerbi;
                         SVGLegend.prototype.updateLayout = function () {
                             var legendViewport = this.viewport;
                             var orientation = this.orientation;
-                            if (this.data) {
-                                if (orientation === legend.LegendPosition.Top || orientation === legend.LegendPosition.Bottom || orientation === legend.LegendPosition.TopCenter || orientation === legend.LegendPosition.BottomCenter) {
-                                    if (this.data.showPrimary)
-                                        legendViewport.height = legendViewport.height + 3 * (this.legendFontSizeMarginDifference) + 20;
-                                    else
-                                        legendViewport.height = legendViewport.height + (this.legendFontSizeMarginDifference);
-                                }
+                            if(this.data != undefined && this.data)
+                            {
+                                    if (orientation === legend.LegendPosition.Top || orientation === legend.LegendPosition.Bottom || orientation === legend.LegendPosition.TopCenter || orientation === legend.LegendPosition.BottomCenter) {
+                                        if (this.data.showPrimary)
+                                            legendViewport.height = legendViewport.height + 3 * (this.legendFontSizeMarginDifference) + 20;
+                                        else
+                                            legendViewport.height = legendViewport.height + (this.legendFontSizeMarginDifference);
+                                    }
+                                
                             }
-
                             this.svg.attr({
                                 "height": legendViewport.height || (orientation === legend.LegendPosition.None ? 0 : this.parentViewport.height),
                                 "width": legendViewport.width || (orientation === legend.LegendPosition.None ? 0 : this.parentViewport.width)
@@ -2172,10 +2173,12 @@ var powerbi;
                             var titleLayout = layout.title;
                             var titleData = titleLayout ? [titleLayout] : [];
                             var hasSelection = this.interactivityService && dataHasSelection(data.dataPoints);
-                            this.group
-                                .selectAll(SVGLegend.LegendItem.selector).remove();
-                            this.group
-                                .selectAll(SVGLegend.LegendTitle.selector).remove();
+                            if (this.data.showPrimary != undefined) {
+                                this.group
+                                    .selectAll(SVGLegend.LegendItem.selector).remove();
+                                this.group
+                                    .selectAll(SVGLegend.LegendTitle.selector).remove();
+                            }
                             var group = this.group;
                             // transform the wrapping group if position is centered
                             if (this.isCentered(this.orientation)) {
@@ -2202,7 +2205,7 @@ var powerbi;
                                 .style({
                                     "fill": data.labelColor,
                                     "font-size": PixelConverter.fromPoint(data.fontSize),
-                                    "font-family": 'Segoe UI Semibold, wf_segoe-ui_semibold, helvetica, arial, sans-serif;'
+                                    "font-family": data.fontFamily === undefined ? 'Segoe UI': data.fontFamily
                                 })
                                 .text(function (d) { return d.text; })
                                 .attr({
@@ -2216,8 +2219,8 @@ var powerbi;
                                 .remove();
                             var This = this;
                             var virtualizedDataPoints = data.dataPoints.slice(this.legendDataStartIndex, this.legendDataStartIndex + layout.numberOfItems);
-                            var iconRadius = textMeasurementService.estimateSvgTextHeight(SVGLegend.getTextProperties(false, "", this.data.fontSize)) / SVGLegend.LegendIconRadiusFactor;
-                            var yHeight = textMeasurementService.estimateSvgTextHeight(SVGLegend.getTextProperties(false, "", this.data.fontSize));
+                            var iconRadius = textMeasurementService.estimateSvgTextHeight(SVGLegend.getTextProperties(false, "", this.data.fontSize,this.data.fontFamily)) / SVGLegend.LegendIconRadiusFactor;
+                            var yHeight = textMeasurementService.estimateSvgTextHeight(SVGLegend.getTextProperties(false, "", this.data.fontSize,this.data.fontFamily));
                             iconRadius = (this.legendFontSizeMarginValue > SVGLegend.DefaultTextMargin) && iconRadius > SVGLegend.LegendIconRadius
                                 ? iconRadius :
                                 SVGLegend.LegendIconRadius;
@@ -2240,7 +2243,9 @@ var powerbi;
                             itemsEnter
                                 .append("title")
                                 .text(function (d) { return d.tooltip; });
-                            legendItems
+                            if(this.data.showPrimary!= undefined)
+                            {
+                                legendItems
                                 .select(SVGLegend.LegendIcon.selector)
                                 .attr({
                                     "cx": function (d, i) { return d.textPosition.x - iconRadius * 2; },
@@ -2255,6 +2260,24 @@ var powerbi;
                                             return d.color;
                                     }
                                 });
+                            }else{
+                                legendItems
+                                .select(SVGLegend.LegendIcon.selector)
+                                .attr({
+                                "cx": function (d, i) { return d.glyphPosition.x; },
+                                "cy": function (d) { return d.glyphPosition.y; },
+                                "r": iconRadius,
+                            })
+                                .style({
+                                "fill": function (d) {
+                                    if (hasSelection && !d.selected)
+                                        return legend.LegendBehavior.dimmedLegendColor;
+                                    else
+                                        return d.color;
+                                }
+                            });
+
+                            }
                             legendItems
                                 .select("title")
                                 .text(function (d) { return d.tooltip; });
@@ -2267,98 +2290,102 @@ var powerbi;
                                 .text(function (d) { return d.label; })
                                 .style({
                                     "fill": data.labelColor,
-                                    "font-size": PixelConverter.fromPoint(data.fontSize)
+                                    "font-size": PixelConverter.fromPoint(data.fontSize),
+                                    "font-family": data.fontFamily === undefined ? 'Segoe UI': data.fontFamily
                                 });
 
                             //Primary Measure
-                            if (this.data.showPrimary) { 
-                                var widthTextShift;
-                                itemsEnter.append('g').classed('PMlegendItems', true);
-                                if (this.isTopOrBottom(this.orientation)) {
-                                    if (!!data && !!data.dataPoints && data.dataPoints.length > 1) {
-                                        widthTextShift = (data.dataPoints[1].textPosition.x - data.dataPoints[0].textPosition.x);
-                                    } else {
-                                        widthTextShift = data.dataPoints[0].textPosition.x;
+                            if (this.data.showPrimary != undefined) {
+                                if (this.data.showPrimary) {
+                                    var widthTextShift;
+                                    itemsEnter.append('g').classed('PMlegendItems', true);
+                                    if (this.isTopOrBottom(this.orientation)) {
+                                        if (!!data && !!data.dataPoints && data.dataPoints.length > 1) {
+                                            widthTextShift = (data.dataPoints[1].textPosition.x - data.dataPoints[0].textPosition.x);
+                                        } else {
+                                            widthTextShift = data.dataPoints[0].textPosition.x;
+                                        }
                                     }
-                                }
-                                else {
-                                    widthTextShift = 1000;
-                                }
-                                itemsEnter.select('.PMlegendItems')
-                                    .append('text')
-                                    .classed('primaryMeasure', true)
-                                    .text(function (d) {
-                                        var textProperties = {
-                                            text: d.measure,
+                                    else {
+                                        widthTextShift = 1000;
+                                    }
+                                    itemsEnter.select('.PMlegendItems')
+                                        .append('text')
+                                        .classed('primaryMeasure', true)
+                                        .text(function (d) {
+                                            var textProperties = {
+                                                text: d.measure,
+                                                fontFamily: "sans-serif",
+                                                fontSize: data.fontSize
+                                            };
+
+                                            return textMeasurementService.getTailoredTextOrDefault(textProperties, widthTextShift);
+                                        });
+                                    itemsEnter.select('.PMlegendItems').append('title').text(function (d) {
+                                        return d.measureTooltip;
+                                    });
+                                    itemsEnter.append('g').classed('SMlegendItems', true);
+                                    itemsEnter.select('.SMlegendItems').append('text').classed('secondaryMeasure', true).text(function (d) {
+                                        var textProperties1 = {
+                                            text: d.percentage,
                                             fontFamily: "sans-serif",
                                             fontSize: data.fontSize
                                         };
 
-                                        return textMeasurementService.getTailoredTextOrDefault(textProperties, widthTextShift);
+                                        return textMeasurementService.getTailoredTextOrDefault(textProperties1, widthTextShift);
                                     });
-                                itemsEnter.select('.PMlegendItems').append('title').text(function (d) {
-                                    return d.measureTooltip;
-                                });
-                                itemsEnter.append('g').classed('SMlegendItems', true);
-                                itemsEnter.select('.SMlegendItems').append('text').classed('secondaryMeasure', true).text(function (d) {
-                                    var textProperties1 = {
-                                        text: d.percentage,
-                                        fontFamily: "sans-serif",
-                                        fontSize: data.fontSize
-                                    };
+                                    itemsEnter.select('.SMlegendItems').append('title').text(function (d) { return d.percTooltip; });
 
-                                    return textMeasurementService.getTailoredTextOrDefault(textProperties1, widthTextShift);
-                                });
-                                itemsEnter.select('.SMlegendItems').append('title').text(function (d) { return d.percTooltip; });
+                                    if (this.isTopOrBottom(this.orientation)) {
+                                        legendItems
+                                            .select('.primaryMeasure')
+                                            .attr({
+                                                'x': function (d) { return d.textPosition.x; },
+                                                'y': function (d) { return 2 * d.textPosition.y + This.legendFontSizeMarginDifference / 2; }
+                                            })
+                                            .style({
+                                                'fill': data.labelColor,
+                                                'font-size': PixelConverter.fromPoint(data.fontSize)
+                                            });
 
-                                if (this.isTopOrBottom(this.orientation)) {
-                                    legendItems
-                                        .select('.primaryMeasure')
-                                        .attr({
-                                            'x': function (d) { return d.textPosition.x; },
-                                            'y': function (d) { return 2 * d.textPosition.y + This.legendFontSizeMarginDifference / 2; }
-                                        })
-                                        .style({
-                                            'fill': data.labelColor,
-                                            'font-size': PixelConverter.fromPoint(data.fontSize)
-                                        });
+                                        legendItems
+                                            .select('.secondaryMeasure')
+                                            .attr({
+                                                'x': function (d) { return d.textPosition.x; },
+                                                'y': function (d) { return 3 * d.textPosition.y + This.legendFontSizeMarginDifference; }
+                                            })
+                                            .style({
+                                                'fill': data.labelColor,
+                                                'font-size': PixelConverter.fromPoint(data.fontSize)
+                                            });
+                                    }
+                                    else {
+                                        legendItems
+                                            .select('.primaryMeasure')
+                                            .attr({
+                                                'x': function (d) { return d.textPosition.x; },
+                                                'y': function (d) { return d.textPosition.y + (This.legendFontSizeMarginDifference / 2) + 20; }
+                                            })
+                                            .style({
+                                                'fill': data.labelColor,
+                                                'font-size': PixelConverter.fromPoint(data.fontSize)
+                                            });
 
-                                    legendItems
-                                        .select('.secondaryMeasure')
-                                        .attr({
-                                            'x': function (d) { return d.textPosition.x; },
-                                            'y': function (d) { return 3 * d.textPosition.y + This.legendFontSizeMarginDifference; }
-                                        })
-                                        .style({
-                                            'fill': data.labelColor,
-                                            'font-size': PixelConverter.fromPoint(data.fontSize)
-                                        });
+                                        legendItems
+                                            .select('.secondaryMeasure')
+                                            .attr({
+                                                'x': function (d) { return d.textPosition.x; },
+                                                'y': function (d) { return d.textPosition.y + (This.legendFontSizeMarginDifference) + 40; },
+                                            })
+                                            .style({
+                                                'fill': data.labelColor,
+                                                'font-size': PixelConverter.fromPoint(data.fontSize)
+                                            });
+                                    }
                                 }
-                                else {
-                                    legendItems
-                                        .select('.primaryMeasure')
-                                        .attr({
-                                            'x': function (d) { return d.textPosition.x; },
-                                            'y': function (d) { return d.textPosition.y + (This.legendFontSizeMarginDifference / 2) + 20; }
-                                        })
-                                        .style({
-                                            'fill': data.labelColor,
-                                            'font-size': PixelConverter.fromPoint(data.fontSize)
-                                        });
 
-                                    legendItems
-                                        .select('.secondaryMeasure')
-                                        .attr({
-                                            'x': function (d) { return d.textPosition.x; },
-                                            'y': function (d) { return d.textPosition.y + (This.legendFontSizeMarginDifference) + 40; },
-                                        })
-                                        .style({
-                                            'fill': data.labelColor,
-                                            'font-size': PixelConverter.fromPoint(data.fontSize)
-                                        });
-                                }
                             }
-
+                           
                             if (this.interactivityService) {
                                 var iconsSelection = legendItems.select(SVGLegend.LegendIcon.selector);
                                 var behaviorOptions = {
@@ -2397,7 +2424,7 @@ var powerbi;
                                     maxMeasureLength = this.legendFontSizeMarginValue < SVGLegend.DefaultTextMargin ? SVGLegend.MaxTitleLength :
                                         SVGLegend.MaxTitleLength + (SVGLegend.DefaultMaxLegendFactor * this.legendFontSizeMarginDifference);
                                 }
-                                var textProperties = SVGLegend.getTextProperties(true, title, this.data.fontSize);
+                                var textProperties = SVGLegend.getTextProperties(true, title, this.data.fontSize,this.data.fontFamily);
                                 var text = title;
                                 width = textMeasurementService.measureSvgTextWidth(textProperties);
                                 if (width > maxMeasureLength) {
@@ -2519,7 +2546,7 @@ var powerbi;
                         /**
                          * Calculates the widths for each horizontal legend item.
                          */
-                        SVGLegend.calculateHorizontalLegendItemsWidths = function (dataPoints, availableWidth, iconPadding, fontSize) {
+                        SVGLegend.calculateHorizontalLegendItemsWidths = function (dataPoints, availableWidth, iconPadding, fontSize,fontFamily) {
                             var dataPointsLength = dataPoints.length;
                             // Set the maximum amount of space available to each item. They can use less, but can't go over this number.
                             var maxItemWidth = dataPointsLength > 0 ? availableWidth / dataPointsLength | 0 : 0;
@@ -2541,7 +2568,7 @@ var powerbi;
                             // Add legend items until we can't fit any more (the last one doesn't fit) or we've added all of them
                             for (var _i = 0, dataPoints_1 = dataPoints; _i < dataPoints_1.length; _i++) {
                                 var dataPoint = dataPoints_1[_i];
-                                var textProperties = SVGLegend.getTextProperties(false, dataPoint.label, fontSize);
+                                var textProperties = SVGLegend.getTextProperties(false, dataPoint.label, fontSize,fontFamily);
                                 var itemTextWidth = textMeasurementService.measureSvgTextWidth(textProperties);
                                 var desiredWidth = itemTextWidth + iconPadding;
                                 var overMaxWidth = desiredWidth > maxItemWidth;
@@ -2603,108 +2630,167 @@ var powerbi;
                             return legendItems;
                         };
                         SVGLegend.prototype.calculateHorizontalLayout = function (dataPoints, title, navigationArrows) {
-                            // calculate the text shift
-                            var HorizontalTextShift = 4;
-                            var HorizontalIconShift = 11;
-                            // check if we need more space for the margin, or use the default text padding
-                            var fontSizeBiggerThanDefault = this.legendFontSizeMarginDifference > 0;
-                            var fontSizeMargin = fontSizeBiggerThanDefault ? SVGLegend.TextAndIconPadding + this.legendFontSizeMarginDifference : SVGLegend.TextAndIconPadding;
-                            var occupiedWidth = 0;
+                            if (this.data.showPrimary != undefined) {
+                                // calculate the text shift
+                                var HorizontalTextShift = 4;
+                                var HorizontalIconShift = 11;
+                                // check if we need more space for the margin, or use the default text padding
+                                var fontSizeBiggerThanDefault = this.legendFontSizeMarginDifference > 0;
+                                var fontSizeMargin = fontSizeBiggerThanDefault ? SVGLegend.TextAndIconPadding + this.legendFontSizeMarginDifference : SVGLegend.TextAndIconPadding;
+                                var occupiedWidth = 0;
 
-                            var totalSpaceOccupiedThusFar = 0;
-                            var fixedTextShift = SVGLegend.LegendIconRadius + fontSizeMargin + HorizontalTextShift;
-                            var fixedIconShift = HorizontalIconShift + (fontSizeBiggerThanDefault ? this.legendFontSizeMarginDifference : 0);
+                                var totalSpaceOccupiedThusFar = 0;
+                                var fixedTextShift = SVGLegend.LegendIconRadius + fontSizeMargin + HorizontalTextShift;
+                                var fixedIconShift = HorizontalIconShift + (fontSizeBiggerThanDefault ? this.legendFontSizeMarginDifference : 0);
 
-                            // calculate the size of the space for both sides of the radius
-                            var iconTotalItemPadding = SVGLegend.LegendIconRadius * 2 + fontSizeMargin * 3;
-                            var numberOfItems = dataPoints.length;
+                                // calculate the size of the space for both sides of the radius
+                                var iconTotalItemPadding = SVGLegend.LegendIconRadius * 2 + fontSizeMargin * 3;
+                                var numberOfItems = dataPoints.length;
 
-                            var primaryMeasureLength = 0;
-                            if (this.showPrimary) {
-                                primaryMeasureLength = dataPoints[0]['measure'].length;
-                            }
-                            var secondaryMeasurelength = 0;
-                            if (dataPoints && dataPoints[0] && dataPoints[0]['percentage'] && !!dataPoints[0]['percentage'].length && dataPoints[0]['percentage'].length > 0) {
-                                secondaryMeasurelength = dataPoints[0]['percentage'].length;
-                            }
-
-                            // get the Y coordinate which is the middle of the container + the middle of the text height - the delta of the text 
-                            var defaultTextProperties = SVGLegend.getTextProperties(false, "", this.data.fontSize);
-                            var verticalCenter = this.viewport.height / 2;
-                            var textYCoordinate = verticalCenter + textMeasurementService.estimateSvgTextHeight(defaultTextProperties) / 2
-                                - textMeasurementService.estimateSvgTextBaselineDelta(defaultTextProperties);
-                            if (title) {
-                                occupiedWidth += title.width;
-                                // get the Y coordinate which is the middle of the container + the middle of the text height - the delta of the text 
-                                //title.y = verticalCenter + title.height / 2 - textMeasurementService.estimateSvgTextBaselineDelta(SVGLegend.getTextProperties(true, title.text, this.data.fontSize));
-                                title.y = fixedTextShift;
-                            }
-                            // if an arrow should be added, we add space for it
-                            if (this.legendDataStartIndex > 0) {
-                                occupiedWidth += SVGLegend.LegendArrowOffset;
-                            }
-                            // Calculate the width for each of the legend items
-                            var dataPointsLength = dataPoints.length;
-
-                            var parentWidth = this.parentViewport.width;
-                            var maxTextLength = dataPointsLength > 0
-                                ? (((parentWidth - occupiedWidth) - (iconTotalItemPadding * dataPointsLength)) / dataPointsLength) | 0
-                                : 0;
-                            maxTextLength = maxTextLength > SVGLegend.MaxTextLength ? maxTextLength : SVGLegend.MaxTextLength;
-
-                            for (var i = 0; i < dataPointsLength; i++) {
-                                var dp = dataPoints[i];
-
-                                dp.glyphPosition = {
-                                    x: occupiedWidth + SVGLegend.LegendIconRadius,
-                                    y: fixedIconShift
-                                };
-                                dp.textPosition = {
-                                    x: occupiedWidth + fixedTextShift,
-                                    y: fixedTextShift
-                                };
-
-                                var textProperties;
-                                textProperties = SVGLegend.getTextProperties(false, dp.label, this.data.fontSize);
-                                var labelwidth = textMeasurementService.measureSvgTextWidth(textProperties);
-                                var primaryWidth = 0, secondaryWidth = 0;
-
+                                var primaryMeasureLength = 0;
                                 if (this.showPrimary) {
-                                    primaryWidth = textMeasurementService.measureSvgTextWidth(SVGLegend.getTextProperties(false, dp.measure, this.data.fontSize));
+                                    primaryMeasureLength = dataPoints[0]['measure'].length;
                                 }
-                                if (this.secondaryExists) {
-                                    secondaryWidth = textMeasurementService.measureSvgTextWidth(SVGLegend.getTextProperties(false, dp['percentage'], this.data.fontSize));
+                                var secondaryMeasurelength = 0;
+                                if (dataPoints && dataPoints[0] && dataPoints[0]['percentage'] && !!dataPoints[0]['percentage'].length && dataPoints[0]['percentage'].length > 0) {
+                                    secondaryMeasurelength = dataPoints[0]['percentage'].length;
                                 }
-                                var width = labelwidth > primaryWidth ? (labelwidth > secondaryWidth ? labelwidth : secondaryWidth) : (primaryWidth > secondaryWidth ? primaryWidth : secondaryWidth);
-                                width += 15;
-                                var spaceTakenByItem = 0;
-                                if (width < maxTextLength) {
-                                    spaceTakenByItem = iconTotalItemPadding + width;
-                                    dp.measure = dp.measure;
 
-                                } else {
-                                    var text = textMeasurementService.getTailoredTextOrDefault(
-                                        textProperties,
-                                        maxTextLength);
-                                    dp.label = text;
-                                    dp.measure = textMeasurementService.getTailoredTextOrDefault(
-                                        SVGLegend.getTextProperties(false, dp.measure, this.data.fontSize),
-                                        maxTextLength);
-                                    if (this.secondaryExists) {
-                                        dp['percentage'] = textMeasurementService.getTailoredTextOrDefault(SVGLegend.getTextProperties(false, dp['percentage'], this.data.fontSize),
-                                            maxTextLength);
+                                // get the Y coordinate which is the middle of the container + the middle of the text height - the delta of the text 
+                                var defaultTextProperties = SVGLegend.getTextProperties(false, "", this.data.fontSize,this.data.fontFamily);
+                                var verticalCenter = this.viewport.height / 2;
+                                var textYCoordinate = verticalCenter + textMeasurementService.estimateSvgTextHeight(defaultTextProperties) / 2
+                                    - textMeasurementService.estimateSvgTextBaselineDelta(defaultTextProperties);
+                                if (title) {
+                                    occupiedWidth += title.width;
+                                    // get the Y coordinate which is the middle of the container + the middle of the text height - the delta of the text 
+                                    title.y = fixedTextShift;
+                                }
+                                // if an arrow should be added, we add space for it
+                                if (this.legendDataStartIndex > 0) {
+                                    occupiedWidth += SVGLegend.LegendArrowOffset;
+                                }
+                                // Calculate the width for each of the legend items
+                                var dataPointsLength = dataPoints.length;
+
+                                var parentWidth = this.parentViewport.width;
+                                var maxTextLength = dataPointsLength > 0
+                                    ? (((parentWidth - occupiedWidth) - (iconTotalItemPadding * dataPointsLength)) / dataPointsLength) | 0
+                                    : 0;
+                                maxTextLength = maxTextLength > SVGLegend.MaxTextLength ? maxTextLength : SVGLegend.MaxTextLength;
+
+                                for (var i = 0; i < dataPointsLength; i++) {
+                                    var dp = dataPoints[i];
+
+                                    dp.glyphPosition = {
+                                        x: occupiedWidth + SVGLegend.LegendIconRadius,
+                                        y: fixedIconShift
+                                    };
+                                    dp.textPosition = {
+                                        x: occupiedWidth + fixedTextShift,
+                                        y: fixedTextShift
+                                    };
+
+                                    var textProperties;
+                                    textProperties = SVGLegend.getTextProperties(false, dp.label, this.data.fontSize,this.data.fontFamily);
+                                    var labelwidth = textMeasurementService.measureSvgTextWidth(textProperties);
+                                    var primaryWidth = 0, secondaryWidth = 0;
+
+                                    if (this.showPrimary) {
+                                        primaryWidth = textMeasurementService.measureSvgTextWidth(SVGLegend.getTextProperties(false, dp.measure, this.data.fontSize,this.data.fontFamily));
                                     }
-                                    spaceTakenByItem = iconTotalItemPadding + maxTextLength;
+                                    if (this.secondaryExists) {
+                                        secondaryWidth = textMeasurementService.measureSvgTextWidth(SVGLegend.getTextProperties(false, dp['percentage'], this.data.fontSize,this.data.fontFamily));
+                                    }
+                                    var width = labelwidth > primaryWidth ? (labelwidth > secondaryWidth ? labelwidth : secondaryWidth) : (primaryWidth > secondaryWidth ? primaryWidth : secondaryWidth);
+                                    width += 15;
+                                    var spaceTakenByItem = 0;
+                                    if (width < maxTextLength) {
+                                        spaceTakenByItem = iconTotalItemPadding + width;
+                                        dp.measure = dp.measure;
+
+                                    } else {
+                                        var text = textMeasurementService.getTailoredTextOrDefault(
+                                            textProperties,
+                                            maxTextLength);
+                                        dp.label = text;
+                                        dp.measure = textMeasurementService.getTailoredTextOrDefault(
+                                            SVGLegend.getTextProperties(false, dp.measure, this.data.fontSize,this.data.fontFamily),
+                                            maxTextLength);
+                                        if (this.secondaryExists) {
+                                            dp['percentage'] = textMeasurementService.getTailoredTextOrDefault(SVGLegend.getTextProperties(false, dp['percentage'], this.data.fontSize,this.data.fontFamily),
+                                                maxTextLength);
+                                        }
+                                        spaceTakenByItem = iconTotalItemPadding + maxTextLength;
+                                    }
+
+                                    occupiedWidth += spaceTakenByItem;
+
+                                    if (occupiedWidth > parentWidth) {
+                                        numberOfItems = i;
+                                        break;
+                                    }
                                 }
 
-                                occupiedWidth += spaceTakenByItem;
-
-                                if (occupiedWidth > parentWidth) {
-                                    numberOfItems = i;
-                                    break;
+                            }
+                            else {
+                                // calculate the text shift
+                                var HorizontalTextShift = 4 + SVGLegend.LegendIconRadius;
+                                // check if we need more space for the margin, or use the default text padding
+                                var fontSizeBiggerThanDefault = this.legendFontSizeMarginDifference > 0;
+                                var fontSizeMargin = fontSizeBiggerThanDefault ? SVGLegend.TextAndIconPadding + this.legendFontSizeMarginDifference : SVGLegend.TextAndIconPadding;
+                                var fixedTextShift = (fontSizeMargin / (SVGLegend.LegendIconRadiusFactor / 2)) + HorizontalTextShift;
+                                var occupiedWidth = 0;
+                                // calculate the size of the space for both sides of the radius
+                                var iconTotalItemPadding = SVGLegend.LegendIconRadius * 2 + fontSizeMargin * 1.5;
+                                var numberOfItems = dataPoints.length;
+                                // get the Y coordinate which is the middle of the container + the middle of the text height - the delta of the text 
+                                var defaultTextProperties = SVGLegend.getTextProperties(false, "", this.data.fontSize,this.data.fontFamily);
+                                var verticalCenter = this.viewport.height / 2;
+                                var textYCoordinate = verticalCenter + textMeasurementService.estimateSvgTextHeight(defaultTextProperties) / 2
+                                    - textMeasurementService.estimateSvgTextBaselineDelta(defaultTextProperties);
+                                if (title) {
+                                    occupiedWidth += title.width;
+                                    // get the Y coordinate which is the middle of the container + the middle of the text height - the delta of the text 
+                                    title.y = verticalCenter + title.height / 2 - textMeasurementService.estimateSvgTextBaselineDelta(SVGLegend.getTextProperties(true, title.text, this.data.fontSize,this.data.fontFamily));
+                                }
+                                // if an arrow should be added, we add space for it
+                                if (this.legendDataStartIndex > 0) {
+                                    occupiedWidth += SVGLegend.LegendArrowOffset;
+                                }
+                                // Calculate the width for each of the legend items
+                                var dataPointsLength = dataPoints.length;
+                                var availableWidth = this.parentViewport.width - occupiedWidth;
+                                var legendItems = SVGLegend.calculateHorizontalLegendItemsWidths(dataPoints, availableWidth, iconTotalItemPadding, this.data.fontSize,this.data.fontFamily);
+                                numberOfItems = legendItems.length;
+                                // If we can't show all the legend items, subtract the "next" arrow space from the available space and re-run the width calculations 
+                                if (numberOfItems !== dataPointsLength) {
+                                    availableWidth -= SVGLegend.LegendArrowOffset;
+                                    legendItems = SVGLegend.calculateHorizontalLegendItemsWidths(dataPoints, availableWidth, iconTotalItemPadding, this.data.fontSize,this.data.fontFamily);
+                                    numberOfItems = legendItems.length;
+                                }
+                                for (var _i = 0, legendItems_1 = legendItems; _i < legendItems_1.length; _i++) {
+                                    var legendItem = legendItems_1[_i];
+                                    var dataPoint = legendItem.dataPoint;
+                                    dataPoint.glyphPosition = {
+                                        // the space taken so far + the radius + the margin / radiusFactor to prevent huge spaces
+                                        x: occupiedWidth + SVGLegend.LegendIconRadius + (this.legendFontSizeMarginDifference / SVGLegend.LegendIconRadiusFactor),
+                                        // The middle of the container but a bit lower due to text not being in the middle (qP for example making middle between q and P)
+                                        y: (this.viewport.height * SVGLegend.LegendIconYRatio),
+                                    };
+                                    dataPoint.textPosition = {
+                                        x: occupiedWidth + fixedTextShift,
+                                        y: textYCoordinate,
+                                    };
+                                    // If we're over the max width, process it so it fits
+                                    if (legendItem.desiredOverMaxWidth) {
+                                        var textWidth = legendItem.width - iconTotalItemPadding;
+                                        var text = textMeasurementService.getTailoredTextOrDefault(legendItem.textProperties, textWidth);
+                                        dataPoint.label = text;
+                                    }
+                                    occupiedWidth += legendItem.width;
                                 }
                             }
-
                             //#code
                             this.visibleLegendWidth = occupiedWidth;
                             this.updateNavigationArrowLayout(navigationArrows, dataPointsLength, numberOfItems);
@@ -2717,92 +2803,160 @@ var powerbi;
                             var fontFactor = fontSizeBiggerThenDefault ? this.legendFontSizeMarginDifference : 0;
                             // calculate the size needed after font size change
                             var verticalLegendHeight = 20 + fontFactor;
-                            var spaceNeededByTitle = 15 + (fontFactor * 1.3);
-                            var extraShiftForTextAlignmentToIcon = 4 + (fontFactor * 1.3);
-                            var totalSpaceOccupiedThusFar = verticalLegendHeight;
-                            // the default space for text and icon radius + the margin after the font size change
-                            var fixedHorizontalIconShift = SVGLegend.TextAndIconPadding + SVGLegend.LegendIconRadius; // + (this.legendFontSizeMarginDifference / SVGLegend.LegendIconRadiusFactor);
-                            var fixedHorizontalTextShift = SVGLegend.TextAndIconPadding + SVGLegend.LegendIconRadius + fixedHorizontalIconShift;// * 2;
-                            // check how much space is needed
-                            var maxHorizontalSpaceAvaliable = autoWidth
-                                ? this.parentViewport.width * SVGLegend.LegendMaxWidthFactor
-                                - fixedHorizontalTextShift - SVGLegend.LegendEdgeMariginWidth
-                                : this.lastCalculatedWidth
-                                - fixedHorizontalTextShift - SVGLegend.LegendEdgeMariginWidth;
-                            var numberOfItems = dataPoints.length;
-                            var maxHorizontalSpaceUsed = 0;
-                            var parentHeight = this.parentViewport.height;
-                            if (title) {
-                                totalSpaceOccupiedThusFar += spaceNeededByTitle;
-                                title.x = SVGLegend.TextAndIconPadding;
-                                title.y = spaceNeededByTitle;
-                                maxHorizontalSpaceUsed = title.width || 0;
-                            }
-                            // if an arrow should be added, we add space for it
-                            if (this.legendDataStartIndex > 0)
-                                totalSpaceOccupiedThusFar += SVGLegend.LegendArrowOffset;
-                            var dataPointsLength = dataPoints.length;
-                            for (var i = 0; i < dataPointsLength; i++) {
-                                var dp = dataPoints[i];
-                                var textProperties = SVGLegend.getTextProperties(false, dp.label, this.data.fontSize);
-                                dp.glyphPosition = {
-                                    x: fixedHorizontalIconShift,
-                                    //y: (totalSpaceOccupiedThusFar + extraShiftForTextAlignmentToIcon) - textMeasurementService.estimateSvgTextBaselineDelta(textProperties)
-                                    y: totalSpaceOccupiedThusFar + fontFactor
-                                };
-                                dp.textPosition = {
-                                    x: fixedHorizontalTextShift,
-                                    y: totalSpaceOccupiedThusFar + extraShiftForTextAlignmentToIcon
-                                };
-
-                                if (this.data.showPrimary) {
-                                    totalSpaceOccupiedThusFar = totalSpaceOccupiedThusFar + 20 + (this.legendFontSizeMarginDifference / 2);
-                                    totalSpaceOccupiedThusFar = totalSpaceOccupiedThusFar + 20 + (this.legendFontSizeMarginDifference / 2);
+                            if (this.data.showPrimary != undefined) {
+                                var spaceNeededByTitle = 15 + (fontFactor * 1.3);
+                                var extraShiftForTextAlignmentToIcon = 4 + (fontFactor * 1.3);
+                                var totalSpaceOccupiedThusFar = verticalLegendHeight;
+                                // the default space for text and icon radius + the margin after the font size change
+                                var fixedHorizontalIconShift = SVGLegend.TextAndIconPadding + SVGLegend.LegendIconRadius; // + (this.legendFontSizeMarginDifference / SVGLegend.LegendIconRadiusFactor);
+                                var fixedHorizontalTextShift = SVGLegend.TextAndIconPadding + SVGLegend.LegendIconRadius + fixedHorizontalIconShift;// * 2;
+                                // check how much space is needed
+                                var maxHorizontalSpaceAvaliable = autoWidth
+                                    ? this.parentViewport.width * SVGLegend.LegendMaxWidthFactor
+                                    - fixedHorizontalTextShift - SVGLegend.LegendEdgeMariginWidth
+                                    : this.lastCalculatedWidth
+                                    - fixedHorizontalTextShift - SVGLegend.LegendEdgeMariginWidth;
+                                var numberOfItems = dataPoints.length;
+                                var maxHorizontalSpaceUsed = 0;
+                                var parentHeight = this.parentViewport.height;
+                                if (title) {
+                                    totalSpaceOccupiedThusFar += spaceNeededByTitle;
+                                    title.x = SVGLegend.TextAndIconPadding;
+                                    title.y = spaceNeededByTitle;
+                                    maxHorizontalSpaceUsed = title.width || 0;
                                 }
-                                var labelwidth = textMeasurementService.measureSvgTextWidth(textProperties);
-                                var primaryWidth = 0, secondaryWidth = 0;
-                                primaryWidth = textMeasurementService.measureSvgTextWidth(SVGLegend.getTextProperties(false, dp.measure, this.data.fontSize));
-                                secondaryWidth = textMeasurementService.measureSvgTextWidth(SVGLegend.getTextProperties(false, dp['percentage'], this.data.fontSize));
+                                // if an arrow should be added, we add space for it
+                                if (this.legendDataStartIndex > 0)
+                                    totalSpaceOccupiedThusFar += SVGLegend.LegendArrowOffset;
+                                var dataPointsLength = dataPoints.length;
+                                for (var i = 0; i < dataPointsLength; i++) {
+                                    var dp = dataPoints[i];
+                                    var textProperties = SVGLegend.getTextProperties(false, dp.label, this.data.fontSize,this.data.fontFamily);
+                                    dp.glyphPosition = {
+                                        x: fixedHorizontalIconShift,
+                                        //y: (totalSpaceOccupiedThusFar + extraShiftForTextAlignmentToIcon) - textMeasurementService.estimateSvgTextBaselineDelta(textProperties)
+                                        y: totalSpaceOccupiedThusFar + fontFactor
+                                    };
+                                    dp.textPosition = {
+                                        x: fixedHorizontalTextShift,
+                                        y: totalSpaceOccupiedThusFar + extraShiftForTextAlignmentToIcon
+                                    };
 
-                                var width = labelwidth > primaryWidth ? (labelwidth > secondaryWidth ? labelwidth : secondaryWidth) : (primaryWidth > secondaryWidth ? primaryWidth : secondaryWidth);
-                                width += 15;
+                                    if (this.data.showPrimary) {
+                                        totalSpaceOccupiedThusFar = totalSpaceOccupiedThusFar + 20 + (this.legendFontSizeMarginDifference / 2);
+                                        totalSpaceOccupiedThusFar = totalSpaceOccupiedThusFar + 20 + (this.legendFontSizeMarginDifference / 2);
+                                    }
+                                    var labelwidth = textMeasurementService.measureSvgTextWidth(textProperties);
+                                    var primaryWidth = 0, secondaryWidth = 0;
+                                    primaryWidth = textMeasurementService.measureSvgTextWidth(SVGLegend.getTextProperties(false, dp.measure, this.data.fontSize,this.data.fontFamily));
+                                    secondaryWidth = textMeasurementService.measureSvgTextWidth(SVGLegend.getTextProperties(false, dp['percentage'], this.data.fontSize,this.data.fontFamily));
 
-                                //var width = textMeasurementService.measureSvgTextWidth(textProperties);
-                                if (width > maxHorizontalSpaceUsed) {
-                                    maxHorizontalSpaceUsed = width;
+                                    var width = labelwidth > primaryWidth ? (labelwidth > secondaryWidth ? labelwidth : secondaryWidth) : (primaryWidth > secondaryWidth ? primaryWidth : secondaryWidth);
+                                    width += 15;
+
+                                    //var width = textMeasurementService.measureSvgTextWidth(textProperties);
+                                    if (width > maxHorizontalSpaceUsed) {
+                                        maxHorizontalSpaceUsed = width;
+                                    }
+                                    if (width > maxHorizontalSpaceAvaliable) {
+                                        var text = textMeasurementService.getTailoredTextOrDefault(textProperties, maxHorizontalSpaceAvaliable);
+                                        dp.label = text;
+                                        dp.measure = textMeasurementService.getTailoredTextOrDefault(
+                                            SVGLegend.getTextProperties(false, dp.measure, this.data.fontSize,this.data.fontFamily),
+                                            maxHorizontalSpaceAvaliable);
+
+                                        dp['percentage'] = textMeasurementService.getTailoredTextOrDefault(SVGLegend.getTextProperties(false, dp['percentage'], this.data.fontSize,this.data.fontFamily),
+                                            maxHorizontalSpaceAvaliable);
+                                    }
+                                    //code
+                                    else {
+                                        dp.measure = dp.measure;
+                                    }
+                                    totalSpaceOccupiedThusFar += verticalLegendHeight;
+                                    if (totalSpaceOccupiedThusFar > parentHeight) {
+                                        numberOfItems = i;
+                                        break;
+                                    }
                                 }
-                                if (width > maxHorizontalSpaceAvaliable) {
-                                    var text = textMeasurementService.getTailoredTextOrDefault(textProperties, maxHorizontalSpaceAvaliable);
-                                    dp.label = text;
-                                    dp.measure = textMeasurementService.getTailoredTextOrDefault(
-                                        SVGLegend.getTextProperties(false, dp.measure, this.data.fontSize),
-                                        maxHorizontalSpaceAvaliable);
-
-                                    dp['percentage'] = textMeasurementService.getTailoredTextOrDefault(SVGLegend.getTextProperties(false, dp['percentage'], this.data.fontSize),
-                                        maxHorizontalSpaceAvaliable);
+                                if (autoWidth) {
+                                    if (maxHorizontalSpaceUsed < maxHorizontalSpaceAvaliable) {
+                                        this.lastCalculatedWidth = this.viewport.width = Math.ceil(maxHorizontalSpaceUsed + fixedHorizontalTextShift + SVGLegend.LegendEdgeMariginWidth);
+                                    }
+                                    else {
+                                        this.lastCalculatedWidth = this.viewport.width = Math.ceil(this.parentViewport.width * SVGLegend.LegendMaxWidthFactor);
+                                    }
                                 }
-                                //code
                                 else {
-                                    dp.measure = dp.measure;
+                                    this.viewport.width = this.lastCalculatedWidth;
                                 }
-                                totalSpaceOccupiedThusFar += verticalLegendHeight;
-                                if (totalSpaceOccupiedThusFar > parentHeight) {
-                                    numberOfItems = i;
-                                    break;
-                                }
-                            }
-                            if (autoWidth) {
-                                if (maxHorizontalSpaceUsed < maxHorizontalSpaceAvaliable) {
-                                    this.lastCalculatedWidth = this.viewport.width = Math.ceil(maxHorizontalSpaceUsed + fixedHorizontalTextShift + SVGLegend.LegendEdgeMariginWidth);
-                                }
-                                else {
-                                    this.lastCalculatedWidth = this.viewport.width = Math.ceil(this.parentViewport.width * SVGLegend.LegendMaxWidthFactor);
-                                }
+                                this.visibleLegendHeight = totalSpaceOccupiedThusFar - verticalLegendHeight;
                             }
                             else {
-                                this.viewport.width = this.lastCalculatedWidth;
+                                var spaceNeededByTitle = 15 + fontFactor;
+                                var extraShiftForTextAlignmentToIcon = 4 + fontFactor;
+                                var totalSpaceOccupiedThusFar = verticalLegendHeight;
+                                // the default space for text and icon radius + the margin after the font size change
+                                var fixedHorizontalIconShift = SVGLegend.TextAndIconPadding + SVGLegend.LegendIconRadius + (this.legendFontSizeMarginDifference / SVGLegend.LegendIconRadiusFactor);
+                                var fixedHorizontalTextShift = fixedHorizontalIconShift * 2;
+                                // check how much space is needed
+                                var maxHorizontalSpaceAvaliable = autoWidth
+                                    ? this.parentViewport.width * SVGLegend.LegendMaxWidthFactor
+                                    - fixedHorizontalTextShift - SVGLegend.LegendEdgeMariginWidth
+                                    : this.lastCalculatedWidth
+                                    - fixedHorizontalTextShift - SVGLegend.LegendEdgeMariginWidth;
+                                var numberOfItems = dataPoints.length;
+                                var maxHorizontalSpaceUsed = 0;
+                                var parentHeight = this.parentViewport.height;
+                                if (title) {
+                                    totalSpaceOccupiedThusFar += spaceNeededByTitle;
+                                    title.x = SVGLegend.TextAndIconPadding;
+                                    title.y = spaceNeededByTitle;
+                                    maxHorizontalSpaceUsed = title.width || 0;
+                                }
+                                // if an arrow should be added, we add space for it
+                                if (this.legendDataStartIndex > 0)
+                                    totalSpaceOccupiedThusFar += SVGLegend.LegendArrowOffset;
+                                var dataPointsLength = dataPoints.length;
+                                for (var i = 0; i < dataPointsLength; i++) {
+                                    var dp = dataPoints[i];
+                                    var textProperties = SVGLegend.getTextProperties(false, dp.label, this.data.fontSize,this.data.fontFamily);
+                                    dp.glyphPosition = {
+                                        x: fixedHorizontalIconShift,
+                                        y: (totalSpaceOccupiedThusFar + extraShiftForTextAlignmentToIcon) - textMeasurementService.estimateSvgTextBaselineDelta(textProperties)
+                                    };
+                                    dp.textPosition = {
+                                        x: fixedHorizontalTextShift,
+                                        y: totalSpaceOccupiedThusFar + extraShiftForTextAlignmentToIcon
+                                    };
+                                    // TODO: [PERF] Get rid of this extra measurement, and modify
+                                    // getTailoredTextToReturnWidth + Text
+                                    var width = textMeasurementService.measureSvgTextWidth(textProperties);
+                                    if (width > maxHorizontalSpaceUsed) {
+                                        maxHorizontalSpaceUsed = width;
+                                    }
+                                    if (width > maxHorizontalSpaceAvaliable) {
+                                        var text = textMeasurementService.getTailoredTextOrDefault(textProperties, maxHorizontalSpaceAvaliable);
+                                        dp.label = text;
+                                    }
+                                    totalSpaceOccupiedThusFar += verticalLegendHeight;
+                                    if (totalSpaceOccupiedThusFar > parentHeight) {
+                                        numberOfItems = i;
+                                        break;
+                                    }
+                                }
+                                if (autoWidth) {
+                                    if (maxHorizontalSpaceUsed < maxHorizontalSpaceAvaliable) {
+                                        this.lastCalculatedWidth = this.viewport.width = Math.ceil(maxHorizontalSpaceUsed + fixedHorizontalTextShift + SVGLegend.LegendEdgeMariginWidth);
+                                    }
+                                    else {
+                                        this.lastCalculatedWidth = this.viewport.width = Math.ceil(this.parentViewport.width * SVGLegend.LegendMaxWidthFactor);
+                                    }
+                                }
+                                else {
+                                    this.viewport.width = this.lastCalculatedWidth;
+                                }
+                                this.visibleLegendHeight = totalSpaceOccupiedThusFar;
                             }
-                            this.visibleLegendHeight = totalSpaceOccupiedThusFar - verticalLegendHeight;
                             navigationArrows.forEach(function (d) { return d.x = _this.lastCalculatedWidth / 2; });
                             this.updateNavigationArrowLayout(navigationArrows, dataPointsLength, numberOfItems);
                             return numberOfItems;
@@ -2867,12 +3021,10 @@ var powerbi;
                             }
                         };
                         SVGLegend.prototype.reset = function () { };
-                        SVGLegend.getTextProperties = function (isTitle, text, fontSize) {
+                        SVGLegend.getTextProperties = function (isTitle, text, fontSize,fontFamily) {
                             return {
                                 text: text,
-                                fontFamily: isTitle
-                                    ? SVGLegend.DefaultTitleFontFamily
-                                    : SVGLegend.DefaultFontFamily,
+                                fontFamily: fontFamily === undefined ? 'Segoe UI': fontFamily,
                                 fontSize: PixelConverter.fromPoint(fontSize || SVGLegend.DefaultFontSizeInPt)
                             };
                         };

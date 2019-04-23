@@ -425,6 +425,7 @@ declare module powerbi.extensibility.utils.chart.legend {
         grouped?: boolean;
         labelColor?: string;
         fontSize?: number;
+        fontFamily?: string;
         measureSum? : number;
         showPrimary? : boolean;
     }

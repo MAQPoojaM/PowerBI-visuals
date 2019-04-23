@@ -7,6 +7,7 @@ Learn how to install and use the chartutils in your custom visuals:
 
 ## Change Log
 > Added option to include measure in legend
+> Added option to include fontfamily in legend
 
 ## License
 See the [LICENSE](./LICENSE) file for license rights and limitations (MIT).
