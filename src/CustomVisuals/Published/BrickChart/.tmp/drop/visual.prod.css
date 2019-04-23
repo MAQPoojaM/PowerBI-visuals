@@ -1,0 +1,31 @@
+.visual-BrickChart1454871868044_DEBUG .brickchart_topContainer {
+  position: absolute;
+  line-height: normal;
+  cursor: default;
+  text-align: center;
+}
+.visual-BrickChart1454871868044_DEBUG .brickchart_topContainer .matrix {
+  position: relative;
+  display: inline-block;
+  margin-top: 0;
+  margin-bottom: 0;
+  transform-origin: 50% 0 0;
+}
+.visual-BrickChart1454871868044_DEBUG .bc_ErrorMessage {
+  text-align: center;
+  font-size: 20px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  top: 45%;
+  width: 100%;
+  position: absolute;
+}
+.visual-BrickChart1454871868044_DEBUG .bc_ErrorMsg {
+  text-align: center;
+  font-size: 20px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  top: 45%;
+  width: 100%;
+  position: absolute;
+}

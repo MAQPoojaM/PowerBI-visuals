@@ -2272,7 +2272,6 @@ var powerbi;
                                 legendTitle
                                     .append('title').text(secondaryTooltip);
                             }
-                            // legendTitle.exit().remove();
                             //#code
                             var virtualizedDataPoints = data.dataPoints.slice(this.legendDataStartIndex, this.legendDataStartIndex + layout.numberOfItems);
                             var iconRadius = textMeasurementService.estimateSvgTextHeight(SVGLegend.getTextProperties(false, "", this.data.fontSize)) / SVGLegend.LegendIconRadiusFactor;
@@ -2281,7 +2280,6 @@ var powerbi;
                                 SVGLegend.LegendIconRadius;
                             // line added for fixing legend circle issue
                             this.iconRadius = iconRadius;
-                            // SVGLegend.LegendIconRadius = iconRadius;
                             var legendItems = group
                                 .selectAll(SVGLegend.LegendItem.selector)
                                 .data(virtualizedDataPoints, function (d) {
@@ -2923,8 +2921,9 @@ var powerbi;
                         };
                         SVGLegend.prototype.calculateHorizontalLayout = function (dataPoints, title, navigationArrows) {
                             // calculate the text shift
-                            var HorizontalTextShift = 4;// + SVGLegend.LegendIconRadius;
+                            var HorizontalTextShift = 4;
                             var HorizontalIconShift = 11;
+
                             // check if we need more space for the margin, or use the default text padding
                             var fontSizeBiggerThanDefault = this.legendFontSizeMarginDifference > 0;
                             var fontSizeMargin = fontSizeBiggerThanDefault ? SVGLegend.TextAndIconPadding + this.legendFontSizeMarginDifference : SVGLegend.TextAndIconPadding;
@@ -2934,15 +2933,13 @@ var powerbi;
                             var fixedIconShift = HorizontalIconShift + (fontSizeBiggerThanDefault ? this.legendFontSizeMarginDifference : 0);
                             // calculate the size of the space for both sides of the radius
                             var iconTotalItemPadding = SVGLegend.LegendIconRadius * 2 + fontSizeMargin * 3;
-                            // var iconTotalItemPadding = SVGLegend.LegendIconRadius * 2 + fontSizeMargin * 1.5;
                             var numberOfItems = dataPoints.length;
                             //code
                             var primaryMeasureLength = 0;
                             if (this.showPrimary) {
                                 primaryMeasureLength = dataPoints[0]['measure'].length;
                             }
-                            // }
-                            // 
+
                             var secondaryMeasurelength = 0;
                             if (dataPoints && dataPoints[0] && dataPoints[0]['secondaryMeasure'] && !!dataPoints[0]['secondaryMeasure'].length && dataPoints[0]['secondaryMeasure'].length > 0) {
                                 secondaryMeasurelength = dataPoints[0]['secondaryMeasure'].length;
@@ -2957,7 +2954,6 @@ var powerbi;
                                 occupiedWidth += title.width;
                                 // get the Y coordinate which is the middle of the container + the middle of the text height - the delta of the text 
 
-                                // title.y = verticalCenter + title.height / 2 - textMeasurementService.estimateSvgTextBaselineDelta(SVGLegend.getTextProperties(true, title.text, this.data.fontSize));
                                 title.y = fixedTextShift;
                             }
                             // if an arrow should be added, we add space for it
@@ -2966,10 +2962,7 @@ var powerbi;
                             }
                             // Calculate the width for each of the legend items
                             var dataPointsLength = dataPoints.length;
-                            // var availableWidth = this.parentViewport.width - occupiedWidth;
 
-                            // var legendItems = SVGLegend.calculateHorizontalLegendItemsWidths(dataPoints, availableWidth, iconTotalItemPadding, this.data.fontSize);
-                            // numberOfItems = legendItems.length;
                             //code
                             var parentWidth = this.parentViewport.width;
                             var maxTextLength = dataPointsLength > 0
@@ -2978,13 +2971,7 @@ var powerbi;
                             maxTextLength = maxTextLength > SVGLegend.MaxTextLength ? maxTextLength : SVGLegend.MaxTextLength;
                             //#code
 
-                            // If we can't show all the legend items, subtract the "next" arrow space from the available space and re-run the width calculations 
-                            // if (numberOfItems !== dataPointsLength) {
-                            //     availableWidth -= SVGLegend.LegendArrowOffset;
-                            //     legendItems = SVGLegend.calculateHorizontalLegendItemsWidths(dataPoints, availableWidth, iconTotalItemPadding, this.data.fontSize);
-                            //     numberOfItems = legendItems.length;
-                            // }
-
+                            
                             for (var i = 0; i < dataPointsLength; i++) {
                                 var dp = dataPoints[i];
                                 var circleRadius = SVGLegend.LegendIconRadius;
@@ -3062,7 +3049,7 @@ var powerbi;
                             var extraShiftForTextAlignmentToIcon = 4 + (fontFactor * 1.3);
                             var totalSpaceOccupiedThusFar = 0;//verticalLegendHeight;
                             // the default space for text and icon radius + the margin after the font size change
-                            var fixedHorizontalIconShift = SVGLegend.TextAndIconPadding + SVGLegend.LegendIconRadius;// + (this.legendFontSizeMarginDifference / SVGLegend.LegendIconRadiusFactor);
+                            var fixedHorizontalIconShift = SVGLegend.TextAndIconPadding + SVGLegend.LegendIconRadius;
                             var fixedHorizontalTextShift = SVGLegend.TextAndIconPadding + SVGLegend.LegendIconRadius + fixedHorizontalIconShift;// * 2;
                             // check how much space is needed
                             var maxHorizontalSpaceAvaliable = autoWidth
@@ -3116,7 +3103,6 @@ var powerbi;
                                 }
                                 dp.glyphPosition = {
                                     x: iconShift,
-                                    // y: (totalSpaceOccupiedThusFar + extraShiftForTextAlignmentToIcon) - textMeasurementService.estimateSvgTextBaselineDelta(textProperties)
                                     y: totalSpaceOccupiedThusFar + fontFactor
                                 };
                                 dp.textPosition = {
