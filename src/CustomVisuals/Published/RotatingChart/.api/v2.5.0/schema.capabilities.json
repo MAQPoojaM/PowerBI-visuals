@@ -1,5 +1,5 @@
 {
-    "PBI_API_VERSION": "v2.1.0",
+    "PBI_API_VERSION": "v2.5.0",
     "type": "object",
     "properties": {
         "dataRoles": {
@@ -40,9 +40,17 @@
             "type": "boolean",
             "description": "Tells the host to include highlight data"
         },
+        "supportsSynchronizingFilterState": {
+            "type": "boolean",
+            "description": "Indicates whether the visual supports synchronization across report pages (for slicer visuals only)"
+        },
         "advancedEditModeSupport": {
             "type": "number",
             "description": "Indicates the action requested from the host when this visual enters Advanced Edit mode."
+        },
+        "supportsLandingPage": {
+            "type": "boolean",
+            "description": "Indicates whether the visual supports a landing page"
         }
     },
     "additionalProperties": false,
@@ -650,6 +658,10 @@
                             "type": "string",
                             "description": "The localization key for the displayed name in the stringResourced file"
                         },
+                        "objectCategory": {
+                            "type": "number",
+                            "description": "What aspect of the visual this object controlls (1 = Formatting, 2 = Analytics). Formatting: look & feel, colors, axes, labels etc. Analytics: forcasts, trendlines, reference lines and shapes etc."
+                        },
                         "description": {
                             "type": "string",
                             "description": "A description of this object shown to the user as a tooltip"
@@ -725,6 +737,10 @@
                     "type": "string",
                     "description": "Text to display if the field is empty"
                 },
+                "placeHolderTextKey": {
+                    "type": "string",
+                    "description": "The localization key for the placeHolderText in the stringResources file"
+                },
                 "suppressFormatPainterCopy": {
                     "type": "boolean",
                     "description": "Indicates whether the Format Painter should ignore this property"
@@ -737,6 +753,10 @@
                     "type": "object",
                     "description": "Describes substitution rule that replaces property object, described inside the rule, to current property object that contains this rule",
                     "$ref": "#/definitions/substitutionRule"
+                },
+                "filterState": {
+                    "type": "boolean",
+                    "description": "Indicates whether the property is a part of filtration information"
                 }
             },
             "additionalProperties": false

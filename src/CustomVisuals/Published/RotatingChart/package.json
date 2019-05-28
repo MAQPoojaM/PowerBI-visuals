@@ -1,11 +1,18 @@
 {
   "name": "visual",
   "dependencies": {
+    "@types/d3": "^3.5.36",
+    "@types/jquery": "^3.3.29",
     "jquery": "^3.2.1",
     "lodash": "^4.17.4",
-    "powerbi-visuals-utils-formattingutils": "^0.4.0",
-    "powerbi-visuals-utils-dataviewutils": "^1.0.1",
-    "powerbi-visuals-utils-svgutils": "^0.2.1",
-    "powerbi-visuals-utils-typeutils": "^0.2.1"
+    "powerbi-visuals-utils-dataviewutils": "1.2.0",
+    "powerbi-visuals-utils-formattingutils": "3.1.0",
+    "powerbi-visuals-utils-svgutils": "1.2.0",
+    "powerbi-visuals-utils-tooltiputils": "1.1.1",
+    "powerbi-visuals-utils-typeutils": "1.2.0"
+  },
+  "devDependencies": {
+    "tslint": "^5.16.0",
+    "tslint-microsoft-contrib": "^6.1.1"
   }
 }

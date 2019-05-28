@@ -3,13 +3,13 @@
     "name": "RotatingChartByMAQSoftware",
     "displayName": "Rotating Chart by MAQ Software",
     "guid": "rotatingChart1823AN39DB23210918ADF752ECB2A251",
-    "visualClassName": "BarChart",
-    "version": "3.1.4",
+    "visualClassName": "RotatingChart",
+    "version": "3.2.0",
     "description": "Automatically flipping chart with a set frequency which can be used to display different measures sliced by categories",
     "supportUrl": "https://github.com/maqsoftware/PowerBI-visuals/issues",
     "gitHubUrl": "https://github.com/maqsoftware/PowerBI-visuals"
   },
-  "apiVersion": "2.1.0",
+  "apiVersion": "2.5.0",
   "author": {
     "name": "MAQ Software",
     "email": "support@maqsoftware.com"
@@ -26,7 +26,9 @@
     "node_modules/powerbi-visuals-utils-typeutils/lib/index.js",
     "node_modules/powerbi-visuals-utils-svgutils/lib/index.js",
     "node_modules/powerbi-visuals-utils-dataviewutils/lib/index.js",
-    "node_modules/powerbi-visuals-utils-formattingutils/lib/index.js"
+    "node_modules/powerbi-visuals-utils-formattingutils/lib/index.js",
+    "node_modules/powerbi-visuals-utils-tooltiputils/lib/index.js"
+
   ],
   "style": "style/visual.less",
   "capabilities": "capabilities.json"
