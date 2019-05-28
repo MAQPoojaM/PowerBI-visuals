@@ -8,11 +8,12 @@ module powerbi.extensibility.visual {
      * @param {string} propertyName     - Name of desired property.
      * @param {T} defaultValue          - Default value of desired property.
      */
-    export function getValue<T>(objects: DataViewObjects, objectName: string, propertyName: string, defaultValue: T ): T {
+    export function getValue<T>(objects: DataViewObjects,
+                                objectName: string, propertyName: string, defaultValue: T ): T {
         if (objects) {
             const object: DataViewObject = objects[objectName];
             if (object) {
-                const property: T = <T>object[propertyName];
+                const property: T = object[propertyName] as T;
                 if (property !== undefined) {
                     return property;
                 }
@@ -41,7 +42,7 @@ module powerbi.extensibility.visual {
             if (categoryObject) {
                 const object: DataViewPropertyValue = categoryObject[objectName];
                 if (object) {
-                    const property: T = <T>object[propertyName];
+                    const property: T = object[propertyName] as T;
                     if (property !== undefined) {
                         return property;
                     }

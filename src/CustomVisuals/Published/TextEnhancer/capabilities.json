@@ -4,6 +4,11 @@
             "displayName": "Field",
             "name": "category",
             "kind": "GroupingOrMeasure"
+        },
+        {
+            "displayName": "URL Field",
+            "name": "URL",
+            "kind": "GroupingOrMeasure"
         }
     ],
     "dataViewMappings": [
@@ -11,6 +16,11 @@
             "conditions": [
                 {
                     "category": {
+                        "max": 1
+                    }
+                },
+                {
+                    "URL": {
                         "max": 1
                     }
                 }
@@ -22,7 +32,12 @@
                             "bind": {
                                 "to": "category"
                             }
-                        }
+                        },
+                        {
+                            "for": {
+                              "in": "URL"
+                            }
+                          }
                     ]
                 }
             }

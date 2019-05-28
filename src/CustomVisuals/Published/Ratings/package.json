@@ -1,6 +1,8 @@
 {
   "name": "visual",
   "dependencies": {
+    "@types/d3": "^3.5.36",
+    "@types/lodash": "^4.14.108",
     "d3": "^3.5.5",
     "jquery": "^3.3.1",
     "lodash": "^4.17.10",
@@ -8,6 +10,8 @@
     "powerbi-visuals-utils-tooltiputils": "^1.0.1"
   },
   "devDependencies": {
-    "@types/jquery": "^3.3.6"
+    "@types/jquery": "^3.3.29",
+    "tslint": "^5.16.0",
+    "tslint-microsoft-contrib": "^6.1.1"
   }
 }

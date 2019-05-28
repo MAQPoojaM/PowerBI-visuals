@@ -4,12 +4,12 @@
     "displayName": "Ratings by MAQ Software",
     "guid": "PBI_CV_9053509D_D461_463A_B485_CE9F6AB0F13D",
     "visualClassName": "Ratings",
-    "version": "3.0.0.0",
+    "version": "3.1.0.0",
     "description": "This visual is used to visualize ratings or scores using different indicators.",
     "supportUrl": "https://github.com/maqsoftware/PowerBI-visuals/issues",
     "gitHubUrl": "https://github.com/maqsoftware/PowerBI-visuals/"
   },
-  "apiVersion": "2.1.0",
+  "apiVersion": "2.5.0",
   "author": {
     "name": "MAQ Software",
     "email": "support@maqsoftware.com"

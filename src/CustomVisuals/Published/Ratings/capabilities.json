@@ -4,18 +4,33 @@
             "displayName": "Value",
             "description": "The value to be displayed by the indicator ",
             "name": "value",
-            "kind": "Measure"
+            "kind": "Measure",
+            "requiredTypes": [
+                {
+                    "numeric": true
+                }
+            ]
         },
         {
             "displayName": "Maximum value",
             "description": "The maximum rating value used for the end of the scale",
             "name": "max",
-            "kind": "Measure"
+            "kind": "Measure",
+            "requiredTypes": [
+                {
+                    "numeric": true
+                }
+            ]
         },
         {
             "displayName": "Tooltip",
             "name": "tooltipData",
-            "kind": "Measure"
+            "kind": "Measure",
+            "requiredTypes": [
+                {
+                    "numeric": true
+                }
+            ]
         }
     ],
     "dataViewMappings": [

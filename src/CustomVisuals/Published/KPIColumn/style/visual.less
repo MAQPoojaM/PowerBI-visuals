@@ -1,4 +1,4 @@
-.barChart{
+.KPIColumn{
     font-size: 12px;
 }
 .xAxis path {
@@ -54,11 +54,16 @@
 #textToDisplay{
     font-size: 20px;
     color: #000000;
-    height: 100%;
-    width: 700px;
     font-family: 'Segoe UI';
+	position:relative;
     text-align: center;
-    top: 0px;
+    white-space: pre-wrap;       
+    white-space: -moz-pre-wrap;  
+    white-space: -pre-wrap;      
+    white-space: -o-pre-wrap;   
+    word-wrap: break-word;
+    overflow-x: hidden;
+
 }
 .xTitle{
     margin-right: 5px;
@@ -70,7 +75,7 @@
 .path{
     stroke: black;
     fill: none;
-    stroke-width: 0px;
+    stroke-width: 0;
     shape-rendering: crispEdges ;
 }
 .yAxisGrid{

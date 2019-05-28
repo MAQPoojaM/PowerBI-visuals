@@ -1,8 +1,0 @@
-{
-  "name": "visual",
-  "dependencies": {},
-  "globalDependencies": {
-    "d3": "github:DefinitelyTyped/DefinitelyTyped/d3/d3.d.ts#6e2f2280ef16ef277049d0ce8583af167d586c59",
-    "lodash": "registry:dt/lodash#4.14.0+20160802150749"
-  }
-}
